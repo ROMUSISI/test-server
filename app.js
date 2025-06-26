@@ -55,10 +55,10 @@ const getAllFruits = async(req, res) => {
   }
 }
 
-app.get('/fruits', getAllFruits)
+//app.get('/fruits', getAllFruits)
 
 app.listen(port, () => console.log(`Server is listening on port: ${port}`));
-testConnection();
+//testConnection();
 
 
 module.exports = app;
