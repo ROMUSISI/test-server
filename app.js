@@ -26,7 +26,7 @@ app.get('/cars', (req, res) => {
 const getAllFruits = async(req, res) => {
   try {
     const response = await sequelize.query(
-      `SELECT fruitName AS name FROM Fruit`,
+      `SELECT fruitName AS name FROM fruit`,
       {
         type: QueryTypes.SELECT
       }
