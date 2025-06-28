@@ -48,7 +48,7 @@ console.log('retrieved users: ', response)
   }
 }
 
-app.get('/fruits', getAllUsers)
+app.get('/users', getAllUsers)
 
 app.listen(port, () => console.log(`Server is listening on port: ${port}`));
 testConnection();
