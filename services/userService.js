@@ -128,7 +128,7 @@ const getUserById = async (id) => {
 
   //call the query method inside a try catch block
   try {
-    const result = await sequelize.query (
+    const [user] = await sequelize.query (
       sql,
       {
         replacements,
@@ -136,14 +136,27 @@ const getUserById = async (id) => {
       }
     );
 
-    if (result && result[0]) {
-      return result[0]
+    if (user) {
+      return ({
+        status: 'OK',
+        message: 'User was successifully retrieved',
+        user: user
+      })
     }
     else {
-      return null
+      return ({
+        status: 'Not Found',
+        message: 'User not found',
+        user: {}
+      })
     }
   } catch (error) {
-    console.error (error)
+    console.error ('Error retrieving user info: ', error)
+    return ({
+        status: 'Error',
+        message: 'An error occurred while retrieving user info',
+        user: {}
+    })
   }
 }
 

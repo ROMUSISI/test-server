@@ -85,15 +85,39 @@ const getUserById = async(req, res) => {
   const {id} = req.params;
 
   try {
+
     const response = await userService.getUserById (id);
-    if(response) {
-      return res.status(200).json(response);
-    } else {
-      return res.status(404).send ('User record not found')
+
+    console.log('User retrieved by id in controller: ', response)
+
+    if(response && response.status === 'OK') {
+      return res.status(200).json({
+        message: response.message,
+        user: response.user
+      });
+
     }
+
+    if(response && response.status === 'Not Found') {
+      return res.status(404).json({
+        message: response.message,
+        user: response.user
+      });
+    }
+
+    if(response && response.status === 'Error') {
+      return res.status(500).json({
+        message: response.message,
+        user: response.user
+      });
+    }
+
   } catch (error) {
-    console.error (error);
-    return res.status(500).send ('Internal server error')
+    console.error ('An internal server error ocurred while retrieving user data', error);
+      return res.status(500).json({
+        message: 'An internal server error ocurred while retrieving user data',
+        user: {}
+      });
   }
 }
 
