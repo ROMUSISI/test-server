@@ -8,7 +8,7 @@ const createNewDistrict = async (districtData) => {
   const { districtName } = districtData;
   try {
     const [newDistrict, metadata] = await sequelize.query(
-      'INSERT INTO District (districtName) VALUES (:districtName) RETURNING *',
+      'INSERT INTO district (districtName) VALUES (:districtName) RETURNING *',
       {
         replacements: { districtName }, // Safe parameterized query to prevent SQL injection
         type: QueryTypes.INSERT,
@@ -25,7 +25,7 @@ const createNewDistrict = async (districtData) => {
 // Get all districts
 const getAllDistricts = async () => {
   try {
-    const districts = await sequelize.query('SELECT * FROM District', {
+    const districts = await sequelize.query('SELECT * FROM district', {
       type: QueryTypes.SELECT, // SELECT query type
     });
     return districts;
@@ -38,7 +38,7 @@ const getAllDistricts = async () => {
 const getDistrictById = async (id) => {
   try {
     const district = await sequelize.query(
-      'SELECT * FROM District WHERE id = :id',
+      'SELECT * FROM district WHERE id = :id',
       {
         replacements: { id }, // Safe parameterized query
         type: QueryTypes.SELECT,
@@ -59,7 +59,7 @@ const updateDistrict = async (id, districtData) => {
   const { districtName } = districtData;
   try {
     const [updatedRows] = await sequelize.query(
-      'UPDATE District SET districtName = :districtName WHERE id = :id',
+      'UPDATE district SET districtName = :districtName WHERE id = :id',
       {
         replacements: { districtName, id },
         type: QueryTypes.UPDATE,
@@ -79,7 +79,7 @@ const updateDistrict = async (id, districtData) => {
 const deleteDistrict = async (id) => {
   try {
     const deletedRows = await sequelize.query(
-      'DELETE FROM District WHERE id = :id',
+      'DELETE FROM district WHERE id = :id',
       {
         replacements: { id },
         type: QueryTypes.DELETE,

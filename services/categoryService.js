@@ -6,7 +6,7 @@ const getAllCategories = async () => {
   try {
     const categoriesArray = await sequelize.query (
       ` SELECT id AS Category 
-        FROM Category
+        FROM category
         ORDER BY id ASC
       `,
       {

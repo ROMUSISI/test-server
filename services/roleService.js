@@ -6,7 +6,7 @@ const getAllRoles = async () => {
   try {
     const rolesArray = await sequelize.query (
       ` SELECT id AS Role 
-        FROM Role
+        FROM role
         ORDER BY id ASC
       `,
       {

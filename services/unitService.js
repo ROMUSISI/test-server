@@ -5,7 +5,7 @@ const {sequelize} = require ('../databaseConnection/db');
 const getAllUnits = async () => {
   try {
     const unitsArray = await sequelize.query (
-      ` SELECT id AS Unit 
+      ` SELECT id AS unit 
         FROM unit
         ORDER BY id ASC
       `,

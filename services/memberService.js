@@ -27,7 +27,7 @@ const getAllMembers = async (page, pageLimit, searchTerm, userInfo) => {
     const members = await sequelize.query(
       `
       WITH FilteredMembers AS (
-        SELECT * FROM Member
+        SELECT * FROM member
         WHERE deleted <> 1
           ${role !== 'Director' ? 'AND unitId = :unitId' : ''}
           ${searchTerm ? `
@@ -44,7 +44,7 @@ const getAllMembers = async (page, pageLimit, searchTerm, userInfo) => {
           MAX(CASE WHEN category != 'Welfare' THEN category ELSE NULL END) AS category,
           MAX(CASE WHEN category != 'Welfare' THEN categoryValue ELSE 0 END) AS categoryValue,
           SUM(CASE WHEN category != 'Welfare' THEN amountPaid ELSE 0 END) AS totalPaid
-        FROM Subscription
+        FROM subscription
         WHERE yearSubscribed = :year
         AND deleted <> 1
         GROUP BY uniqueMemberId
@@ -56,7 +56,7 @@ const getAllMembers = async (page, pageLimit, searchTerm, userInfo) => {
           MAX(CASE WHEN category = 'Welfare' THEN category ELSE NULL END) AS category,
           MAX(CASE WHEN category = 'Welfare' THEN categoryValue ELSE 0 END) AS categoryValue,
           SUM(CASE WHEN category = 'Welfare' THEN amountPaid ELSE 0 END) AS totalPaid
-        FROM Subscription
+        FROM subscription
         WHERE yearSubscribed = :year
         AND deleted <> 1
         GROUP BY uniqueMemberId
@@ -102,7 +102,7 @@ const getAllMembers = async (page, pageLimit, searchTerm, userInfo) => {
     // Total count for pagination
     const totalCountResult = await sequelize.query(
       `
-      SELECT COUNT(*) AS totalCount FROM Member
+      SELECT COUNT(*) AS totalCount FROM member
       WHERE deleted <> 1
         ${role !== 'Director' ? 'AND unitId = :unitId' : ''}
         ${searchTerm ? `
@@ -144,7 +144,7 @@ const getMemberById = async (id) => {
 
     // 1. Fetch the member
     const [member] = await sequelize.query(
-      `SELECT * FROM Member WHERE uniqueMemberId = :id LIMIT 1`,
+      `SELECT * FROM member WHERE uniqueMemberId = :id LIMIT 1`,
       {
         type: QueryTypes.SELECT,
         replacements: { id }
@@ -166,7 +166,7 @@ const getMemberById = async (id) => {
         MAX(CASE WHEN category != 'Welfare' THEN category END) AS category,
         MAX(CASE WHEN category != 'Welfare' THEN categoryValue END) AS categoryValue,
         SUM(CASE WHEN category != 'Welfare' THEN amountPaid ELSE 0 END) AS totalPaid
-      FROM Subscription
+      FROM subscription
       WHERE uniqueMemberId = :id 
       AND yearSubscribed = :year
       AND deleted <> 1
@@ -396,7 +396,7 @@ const createMember = async (memberData, userInfo) => {
 
   //define query for inserting record
   const sqlInsertMember = `
-    INSERT INTO Member (
+    INSERT INTO member (
       unitId,
       memberName,
       memberType,
@@ -449,7 +449,7 @@ const createMember = async (memberData, userInfo) => {
     //retrieve the newly inserted record
     const createdMemberArray = await sequelize.query (
       `
-      SELECT * FROM Member WHERE id = :insertId`,
+      SELECT * FROM member WHERE id = :insertId`,
       {
         replacements: {insertId},
         type: QueryTypes.SELECT
@@ -529,7 +529,7 @@ const updateMember = async(memberData) => {
 
   //define query for updating record
   const sqlUpdateMember = `
-    UPDATE Member
+    UPDATE member
     SET 
       unitId = :newUnitId,
       uniqueMemberId = :newUniqueMemberId,
@@ -553,7 +553,7 @@ const updateMember = async(memberData) => {
 
   //sql for confirming the record exists
   const sqlMemberExists = `
-    SELECT * FROM Member
+    SELECT * FROM member
     WHERE uniqueMemberId = :id
   `
 
@@ -606,7 +606,7 @@ const deleteMember = async(memberId, staffName) => {
 
     //confirm the record exists
     const recordExists = await sequelize.query(
-      `SELECT * FROM Member 
+      `SELECT * FROM member 
        WHERE uniqueMemberId = :memberId`,
        {
         replacements: {memberId},
@@ -625,7 +625,7 @@ const deleteMember = async(memberId, staffName) => {
 
       //(soft) delete all payments corresponding to the member
       await sequelize.query (
-        `UPDATE Subscription 
+        `UPDATE subscription 
          SET deleted = True
          WHERE uniqueMemberId = :memberId`,
          {
@@ -636,7 +636,7 @@ const deleteMember = async(memberId, staffName) => {
 
       //Then (soft) delete the member record
       await sequelize.query(
-        `UPDATE Member
+        `UPDATE member
          SET deleted = True, deletedBy = :staffName
          WHERE uniqueMemberId = :memberId`,
          {

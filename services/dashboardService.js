@@ -14,12 +14,12 @@ const getDashInfo = async (userId, role, unitId) => {
     role === 'Director' ?
 
       `SELECT COUNT(uniqueMemberId) AS total 
-       FROM Member WHERE deleted <> 1
+       FROM member WHERE deleted <> 1
       ` 
       :
 
       `SELECT COUNT(uniqueMemberId) AS total 
-       FROM Member WHERE deleted <> 1
+       FROM member WHERE deleted <> 1
        AND unitId = :unitId;
       ` 
 
@@ -37,7 +37,7 @@ const getDashInfo = async (userId, role, unitId) => {
             ( 
 
               SELECT s.uniqueMemberId, s.categoryValue, s.category, s.yearSubscribed, s.amountPaid, m.unitId
-              FROM Subscription AS s INNER JOIN Member AS m
+              FROM Subscription AS s INNER JOIN member AS m
               ON s.uniqueMemberId = m.uniqueMemberId
               WHERE m.deleted <> 1
               AND s.deleted <> 1
@@ -64,7 +64,7 @@ const getDashInfo = async (userId, role, unitId) => {
             ( 
 
               SELECT s.uniqueMemberId, s.categoryValue, s.category, s.yearSubscribed, s.amountPaid, m.unitId
-              FROM Subscription AS s INNER JOIN Member AS m
+              FROM Subscription AS s INNER JOIN member AS m
               ON s.uniqueMemberId = m.uniqueMemberId
               WHERE m.deleted <> 1
               AND s.deleted <> 1
@@ -125,7 +125,7 @@ const getDashInfo = async (userId, role, unitId) => {
               ( 
 
                 SELECT s.uniqueMemberId, s.yearSubscribed, s.category, s.amountPaid, m.unitId
-                FROM Subscription AS s INNER JOIN Member AS m
+                FROM Subscription AS s INNER JOIN member AS m
                 ON s.uniqueMemberId = m.uniqueMemberId
                 WHERE m.deleted <> 1
                 AND s.deleted <> 1
@@ -153,7 +153,7 @@ const getDashInfo = async (userId, role, unitId) => {
               ( 
 
                 SELECT s.uniqueMemberId, s.yearSubscribed, s.category, s.amountPaid, m.unitId
-                FROM Subscription AS s INNER JOIN Member AS m
+                FROM Subscription AS s INNER JOIN member AS m
                 ON s.uniqueMemberId = m.uniqueMemberId
                 WHERE m.deleted <> 1
                 AND s.deleted <> 1
@@ -217,7 +217,7 @@ const getDashInfo = async (userId, role, unitId) => {
               ( 
 
                 SELECT s.uniqueMemberId, s.yearSubscribed, s.amountPaid, m.unitId, s.categoryValue
-                FROM Subscription AS s INNER JOIN Member AS m
+                FROM Subscription AS s INNER JOIN member AS m
                 ON s.uniqueMemberId = m.uniqueMemberId
                 WHERE s.category = '${category}'
                 AND s.deleted <> 1
@@ -244,7 +244,7 @@ const getDashInfo = async (userId, role, unitId) => {
               ( 
 
                 SELECT s.uniqueMemberId, s.yearSubscribed, s.amountPaid, m.unitId, s.categoryValue
-                FROM Subscription AS s INNER JOIN Member AS m
+                FROM Subscription AS s INNER JOIN member AS m
                 ON s.uniqueMemberId = m.uniqueMemberId
                 WHERE s.category = '${category}'
                 AND s.deleted <> 1

@@ -34,7 +34,7 @@ const getAllMemberSubscriptions = async () => {
 
     //Then check if there are members
     const membersArray = await sequelize.query (
-      `SELECT * FROM Member LIMIT 1`
+      `SELECT * FROM member LIMIT 1`
     )
     if (!membersArray || !membersArray[0]) { //No members
       return({status: 'Not Found', message: 'No members found', subscriptions: []})
@@ -423,7 +423,7 @@ const createPayment = async (paymentData) => {
         m.memberName
       FROM Subscription AS s
       JOIN user AS u ON s.receivedByUserId = u.id
-      JOIN Member AS m ON s.uniqueMemberId = m.uniqueMemberId
+      JOIN member AS m ON s.uniqueMemberId = m.uniqueMemberId
       WHERE
         ${role === 'Director' ? '1=1' : 'm.unitId = :unitId'}
         ${searchTerm ? `
@@ -441,7 +441,7 @@ const createPayment = async (paymentData) => {
       SELECT COUNT(*) AS total
       FROM Subscription AS s
       JOIN user AS u ON s.receivedByUserId = u.id
-      JOIN Member AS m ON s.uniqueMemberId = m.uniqueMemberId
+      JOIN member AS m ON s.uniqueMemberId = m.uniqueMemberId
       WHERE 
         ${role === 'Director' ? '1=1' : 'm.unitId = :unitId'}
         ${searchTerm ? `
@@ -523,7 +523,7 @@ const getPaymentById = async (id) => {
         mu.userName AS lastModifiedByUserName,
         s.timeLastModified
       FROM Subscription s
-      INNER JOIN Member m ON s.uniqueMemberId = m.uniqueMemberId
+      INNER JOIN member m ON s.uniqueMemberId = m.uniqueMemberId
       LEFT JOIN user ru ON s.receivedByUserId = ru.id
       LEFT JOIN user mu ON s.lastModifiedByUserId = mu.id
       WHERE s.id = :id
@@ -559,7 +559,7 @@ const getAllPaymentsByMemberId = async(memberId) => {
           s.category,
           u.staffName AS receiptedBy
         FROM Subscription AS s
-        LEFT JOIN User as u
+        LEFT JOIN user as u
         ON s.receivedByUserId = u.id
         WHERE ((s.uniqueMemberId = :memberId) AND (s.deleted <>1))
         ORDER BY s.timeReceived DESC
@@ -716,7 +716,7 @@ const updatePayment = async (newPaymentData) => {
         m.memberName
       FROM Subscription AS s
       JOIN user AS u ON s.receivedByUserId = u.id
-      JOIN Member AS m ON s.uniqueMemberId = m.uniqueMemberId)
+      JOIN member AS m ON s.uniqueMemberId = m.uniqueMemberId)
 
       SELECT * FROM q1 WHERE q1.confirmed = 0 AND q1.deleted = 0
       ${role === 'Director' ? '' :  'AND q1.unitId = :unitId'}
@@ -743,7 +743,7 @@ const updatePayment = async (newPaymentData) => {
         m.memberName
       FROM Subscription AS s
       JOIN user AS u ON s.receivedByUserId = u.id
-      JOIN Member AS m ON s.uniqueMemberId = m.uniqueMemberId)
+      JOIN member AS m ON s.uniqueMemberId = m.uniqueMemberId)
 
       SELECT COUNT(*) AS total FROM q1 WHERE q1.confirmed = 0 AND q1.deleted = 0
       ${role === 'Director' ? '' :  'AND q1.unitId = :unitId'}
@@ -971,7 +971,7 @@ const createToken = async(userInfo) => {
       const phoneHint = maskPhoneNumber(phone)
 
       await sequelize.query (
-        ` UPDATE User 
+        ` UPDATE user 
           SET token = :hashedToken,
           tokenVerified = NULL,
           tokenCreatedAt = NOW() 
