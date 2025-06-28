@@ -6,7 +6,7 @@ const getAllCountries = async () => {
   try {
     const countriesArray = await sequelize.query (
       ` SELECT id AS Country 
-        FROM Country
+        FROM country
         ORDER BY id ASC
       `,
       {
@@ -34,7 +34,7 @@ async function getPaginatedCountries(myParams) {
   try {
     // Query to fetch the paginated countries
     const countries = await sequelize.query(
-      `SELECT * FROM Country LIMIT :numLimit OFFSET :offset`,
+      `SELECT * FROM country LIMIT :numLimit OFFSET :offset`,
       {
         replacements: { numLimit, offset },
         type: sequelize.QueryTypes.SELECT,
@@ -43,7 +43,7 @@ async function getPaginatedCountries(myParams) {
 
     // Query to fetch the total count of countries
     const totalCountResult = await sequelize.query(
-      'SELECT COUNT(Id) AS totalCount FROM Country',
+      'SELECT COUNT(Id) AS totalCount FROM country',
       {
         type: sequelize.QueryTypes.SELECT,
       }
