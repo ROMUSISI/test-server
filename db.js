@@ -1,5 +1,5 @@
 const express = require('express');
-const fs = require('fs'); // ← You forgot this line
+const fs = require('fs');
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
@@ -15,15 +15,27 @@ const sequelize = new Sequelize(
       ssl: {
         ca: fs.readFileSync('./certs/ca-certificate.crt')
       }
-    }
+    },
+    logging: false,
   }
 );
 
-// Optional: Test connection
+// ✅ Sync models with database
+const syncDatabase = async ({ force = false, alter = false } = {}) => {
+  try {
+    await sequelize.sync({ force, alter });
+    console.log('✅ Database synchronized.');
+  } catch (error) {
+    console.error('❌ Failed to sync database:', error);
+  }
+};
+
+// ✅ Test connection and sync
 const testConnection = async () => {
   try {
     await sequelize.authenticate();
     console.log('✅ Database connection has been established successfully.');
+    await syncDatabase(); // <- Sync after connection
   } catch (error) {
     console.error('❌ Unable to connect to the database:', error);
   }

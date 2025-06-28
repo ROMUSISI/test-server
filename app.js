@@ -11,51 +11,44 @@ const { QueryTypes } = require('sequelize');
 
 app.use(cors());
 
-app.get('/cars', (req, res) => {
-  res.status(200).json(
-    [
-      {name: 'Wish'},
-      {name: 'LandCruiser'},
-      {name: 'Volvo'},
-      {name: 'Beast'}
-    ]
-  )
-} );
 
 //function to fetch fruits from mytest db
-const getAllFruits = async(req, res) => {
+const getAllUsers = async(req, res) => {
   try {
     const response = await sequelize.query(
-      `SELECT fruitName AS name FROM fruit`,
+      `SELECT * FROM user`,
       {
         type: QueryTypes.SELECT
       }
     );
+
+console.log('retrieved users: ', response)
+
     if(response && response.length>0) {
       console.log(response);
       return res.status(200).json({
-        message: 'All fruits successifully retrieved',
+        message: 'All users successifully retrieved',
         fruits: response
       })
     };
 
     if(!response || !response.length>0) {
-      console.log('No fuit data was found');
+      console.log('No user data was found');
       return res.status(404).json({
-        message: 'No fruits were found',
+        message: 'No users were found',
         fruits: {}
       })
     }
   } catch (error) {
-    console.log('Error while fetching fruit data: ', error);
+    console.log('Error while fetching user data: ', error);
       return res.status(500).json({
-        message: 'A error occured while retrieving fruit data',
+        message: 'An error occured while retrieving user data',
         fruits: {}
       })
   }
 }
 
-app.get('/fruits', getAllFruits)
+app.get('/fruits', getAllUsers)
 
 app.listen(port, () => console.log(`Server is listening on port: ${port}`));
 testConnection();
