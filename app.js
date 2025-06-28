@@ -1,57 +1,87 @@
-const express = require ('express');
-const cors = require ('cors')
-const dotenv = require('dotenv')
+const express = require ('express')
+const app = express();
+const cors = require ('cors');
+const {sequelize, syncDb} = require('./databaseConnection/db')
+
+//import routes
+const districtRoutes = require ('./routes/districtRoutes')
+const userRoutes = require ('./routes/userRoutes')
+const memberRoutes = require ('./routes/memberRoutes')
+const subscriptionRoutes = require ('./routes/subscriptionRoutes')
+const categoryRoutes = require ('./routes/categoryRoutes')
+const unitRoutes = require ('./routes/unitRoutes')
+const countryRoutes = require ('./routes/countryRoutes')
+const roleRoutes = require ('./routes/roleRoutes')
+const dashboardRoutes = require ('./routes/dashboardRoutes')
+const testRoutes = require('./routes/testRoutes')
+const dotenv = require ('dotenv');
+
+// import models
+const District = require ('./models/district')
+const User = require ('./models/User')
+const Member = require ('./models/member')
+const Subscription = require ('./models/subscription')
+const Category = require('./models/category')
+const Unit = require('./models/unit')
+const Role = require('./models/role')
+const Country = require('./models/country');
+const cookieParser = require('cookie-parser');
+
 
 dotenv.config();
-
 const port = process.env.PORT || 7000
-const app = express();
-const { sequelize, testConnection } = require('./db');
-const { QueryTypes } = require('sequelize');
-
-app.use(cors());
 
 
-//function to fetch fruits from mytest db
-const getAllUsers = async(req, res) => {
-  try {
-    const response = await sequelize.query(
-      `SELECT * FROM user`,
-      {
-        type: QueryTypes.SELECT
-      }
-    );
+const allowedOrigins = [
+  "https://membership-app-ui.vercel.app", "http://localhost:5173"
+];
 
-console.log('retrieved users: ', response)
-
-    if(response && response.length>0) {
-      console.log(response);
-      return res.status(200).json({
-        message: 'All users successifully retrieved',
-        fruits: response
-      })
-    };
-
-    if(!response || !response.length>0) {
-      console.log('No user data was found');
-      return res.status(404).json({
-        message: 'No users were found',
-        fruits: {}
-      })
+app.use(cors(/*{
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // allow non-browser requests
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, origin); // dynamically echo back the correct origin
     }
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+}*/));
+
+
+// For production only:
+/*app.use(cors({
+  origin: "https://membership-app-ui.vercel.app",
+  credentials: true,
+}));*/
+
+
+app.use(express.json());
+app.use(cookieParser())
+
+app.use(districtRoutes);
+app.use(userRoutes);
+app.use(memberRoutes);
+app.use(subscriptionRoutes);
+app.use(categoryRoutes);
+app.use(unitRoutes);
+app.use(countryRoutes);
+app.use(roleRoutes);
+app.use(dashboardRoutes);
+app.use(testRoutes);
+
+const startServer = async() => {      //function to start server
+  try {
+
+    syncDb();                          //sync database
+
+
+    app.listen (port, () => {
+      console.log (`server is listening on port ${port}`)
+    })                                  //make server to listen on a specified port
+
   } catch (error) {
-    console.log('Error while fetching user data: ', error);
-      return res.status(500).json({
-        message: 'An error occured while retrieving user data',
-        fruits: {}
-      })
+    console.error (`Failed to connect to server. Error: ${error}`)
   }
-}
+};
 
-app.get('/users', getAllUsers)
-
-app.listen(port, () => console.log(`Server is listening on port: ${port}`));
-testConnection();
-
-
-module.exports = app;
+startServer (); //call function to start server
