@@ -22,7 +22,7 @@ const getAllUsers = async (params, userInfo) => {
         id, unitId, userName, staffName, staffIdNumber, password,
         role, deleted, dateTimeCreated, createdBy, lastModified,
         lastModifiedBy, isActive, email, phone
-      FROM User
+      FROM user
       WHERE 1=1
 
     `;
@@ -59,7 +59,7 @@ const getAllUsers = async (params, userInfo) => {
     });
 
     // Build count query
-    let countQuery = `SELECT COUNT(id) AS totalCount FROM User WHERE 1=1`;
+    let countQuery = `SELECT COUNT(id) AS totalCount FROM user WHERE 1=1`;
     const countReplacements = {};
 
     if (role !== 'Director') {
@@ -123,7 +123,7 @@ const getUserById = async (id) => {
 
   //define query to be executed
   const sql = `
-    SELECT * FROM User WHERE id = :id
+    SELECT * FROM user WHERE id = :id
   `;
 
   //call the query method inside a try catch block
@@ -154,8 +154,8 @@ const deleteUser = async (id) =>{
   const replacements = {id}
 
   //define the queries for checking record existance and for deleting the record.
-  const sqlExists = 'SELECT * FROM User WHERE id = :id';
-  const sqlDelete = 'DELETE FROM User WHERE id = :id'
+  const sqlExists = 'SELECT * FROM user WHERE id = :id';
+  const sqlDelete = 'DELETE FROM user WHERE id = :id'
 
   //confirm record existance
   try {
@@ -212,13 +212,13 @@ const createUser = async(userData) => {
   //Define queries.
   const sqlUserExists = `
     SELECT userName, staffIdNumber 
-    FROM User 
+    FROM user 
     WHERE (userName = :newUser) 
     LIMIT 1
   `
   //sql for inserting users
   const sqlInsertUser = `
-    INSERT INTO User (
+    INSERT INTO user (
       unitId ,
       userName,
       staffName,
@@ -287,7 +287,7 @@ const createUser = async(userData) => {
 
       if (postedNewUser) {
         const createdUser = await sequelize.query (
-          `SELECT * from User
+          `SELECT * from user
             WHERE 
             userName = :newUser 
             AND
@@ -351,7 +351,7 @@ const login = async (userData) => {
   try {
     const userExists = await sequelize.query (
       `SELECT *
-      FROM User 
+      FROM user 
       WHERE userName = :loggingUser 
     `, 
       {
@@ -447,7 +447,7 @@ const updateUser = async (userData) => {
 
   //define query for updating user record
   const sqlUpdateUser = `
-    UPDATE User
+    UPDATE user
     SET
       userName = :newUser,
       staffName = :newStaffName,
@@ -469,7 +469,7 @@ const updateUser = async (userData) => {
     //first confirm that the user exists
     const userExistsArray = await sequelize.query (
       `
-      SELECT * FROM User
+      SELECT * FROM user
       WHERE id = :id 
       LIMIT 1
       `,
@@ -523,7 +523,7 @@ const updateUser = async (userData) => {
         
         //retrieve the updated document
         const updatedUserArray = await sequelize.query (
-          `SELECT * FROM User
+          `SELECT * FROM user
            WHERE id = :id
           `,
           {
@@ -552,7 +552,7 @@ const verifyUserName = async(userName) => {
 
   const [verifiedUser] = await sequelize.query(
     `SELECT staffName, id, phone, email, userName
-     FROM User 
+     FROM user 
      WHERE userName = :userName
      LIMIT 1`,
      {
@@ -615,7 +615,7 @@ const verifyToken = async(token, userName) => {
       `SELECT 
        accountToken,
        accountTokenCreatedAt
-       FROM User
+       FROM user
        WHERE userName = :userName
        LIMIT 1`,
        {
@@ -677,7 +677,7 @@ const createPassword = async (password, userName) => {
     const hashedPassword = await bcrypt.hash(password, await bcrypt.genSalt(10))
 
     const [, affectedUsers] = await sequelize.query(
-      `Update User
+      `Update user
        SET passwordDraft = :hashedPassword
        WHERE userName = :userName`,
        {
