@@ -4,7 +4,7 @@ const dotenv = require('dotenv')
 
 dotenv.config();
 
-const port = process.env.SERVER_PORT
+const port = process.env.PORT || 7000
 const app = express();
 const { sequelize, testConnection } = require('./db');
 const { QueryTypes } = require('sequelize');
