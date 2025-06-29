@@ -152,7 +152,6 @@ const createUser = async (req, res) => {
     userName,
     staffName,
     staffIdNumber,
-    password,
     role,
     email,
     phone,
@@ -165,7 +164,6 @@ const createUser = async (req, res) => {
       userName,
       staffName,
       staffIdNumber,
-      password,
       role,
       email,
       phone,
@@ -259,14 +257,11 @@ const updateUser = async (req, res) => {
     userName,
     staffName,
     staffIdNumber,
-    password,
     role,
     email,
     phone,
     unitId,
-    deleted,
-    lastModifiedBy,
-    isActive
+    lastModifiedBy
   } = req.body;
 
   //assign the destructured variables to the userData object
@@ -275,14 +270,11 @@ const updateUser = async (req, res) => {
     userName,
     staffName,
     staffIdNumber,
-    password,
     role,
     email,
     phone,
     unitId,
-    deleted,
-    lastModifiedBy,
-    isActive
+    lastModifiedBy
   };
 
   try {

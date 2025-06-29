@@ -136,6 +136,8 @@ const getUserById = async (id) => {
       }
     );
 
+    console.log('retrieved user in service layer: ', user)
+
     if (user) {
       return ({
         status: 'OK',
@@ -210,17 +212,12 @@ const createUser = async(userData) => {
       userName: newUser,
       staffName,
       staffIdNumber: newStaffIdNumber,
-      password,
       role,
       email,
       phone,
       createdBy,
       lastModifiedBy,
   } = userData;
-
-  //hash the password by adding 10 salt rounds
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt)
   
   //Define queries.
   const sqlUserExists = `
@@ -236,7 +233,6 @@ const createUser = async(userData) => {
       userName,
       staffName,
       staffIdNumber,
-      password,
       role,
       email,
       phone,
@@ -248,7 +244,6 @@ const createUser = async(userData) => {
       :newUser,
       :staffName,
       :newStaffIdNumber,
-      :hashedPassword,
       :role,
       :email,
       :phone,
@@ -263,7 +258,6 @@ const createUser = async(userData) => {
     newUser,
     staffName,
     newStaffIdNumber,
-    hashedPassword,
     role,
     email,
     phone,
@@ -448,14 +442,11 @@ const updateUser = async (userData) => {
     userName: newUser,
     staffName: newStaffName,
     staffIdNumber: newStaffIdNumber,
-    password: newPassword,
     role: newRole,
     email: newEmail,
     phone: newPhone,
     unitId: newUnitId,
-    deleted: newDeleted,
-    lastModifiedBy: newLastModifiedBy,
-    isActive: newIsActive
+    lastModifiedBy: newLastModifiedBy
   } = userData;
 
   //define query for updating user record
@@ -465,14 +456,11 @@ const updateUser = async (userData) => {
       userName = :newUser,
       staffName = :newStaffName,
       staffIdNumber = :newStaffIdNumber,
-      password = :hashedPassword,
       role = :newRole,
       phone = :newPhone,
       unitId = :newUnitId,
       email = :newEmail,
-      deleted = :newDeleted,
-      lastModifiedBy = :newLastModifiedBy,
-      isActive = :newIsActive
+      lastModifiedBy = :newLastModifiedBy
     WHERE id = :id
   `
 
@@ -498,26 +486,17 @@ const updateUser = async (userData) => {
 
     if (userExistsArray && userExistsArray[0]) {
 
-      //update the user data
-
-      //first hash the password
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(newPassword, salt);
-
       //define replacements map
       const replacementsUpdateUser = {
         id,
         newUser,
         newStaffName,
         newStaffIdNumber,
-        hashedPassword,
         newRole,
         newPhone,
         newUnitId,
         newEmail,
-        newDeleted,
-        newLastModifiedBy,
-        newIsActive
+        newLastModifiedBy
       };
 
       const updatedUserMetaDataArray = await sequelize.query (
@@ -528,8 +507,10 @@ const updateUser = async (userData) => {
         }
       );
 
+      console.log('user update metadata: ', updatedUserMetaDataArray);
+
       if (!updatedUserMetaDataArray || !updatedUserMetaDataArray[1]>0) {
-        return ({status: 'Bad Request', message: 'User updated failed', user: {}})
+        return ({status: 'Bad Request', message: 'No changes were made to the record', user: {}})
       }
 
       if (updatedUserMetaDataArray && updatedUserMetaDataArray[1]>0) {
@@ -549,7 +530,7 @@ const updateUser = async (userData) => {
           const myUpdatedUser = updatedUserArray[0];
           return ({status: 'OK', message: 'User successifully updated', user: myUpdatedUser})
         } else {
-          return ({status: 'Bad Request', message: 'User updated failed', user: {}})
+          return ({status: 'Bad Request', message: 'User update failed', user: {}})
         }
       }
     }

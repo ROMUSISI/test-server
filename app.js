@@ -32,30 +32,7 @@ const cookieParser = require('cookie-parser');
 dotenv.config();
 const port = process.env.PORT || 7000
 
-
-const allowedOrigins = [
-  "https://membership-app-ui.vercel.app", "http://localhost:5173"
-];
-
 app.use(cors());
-
-/*{
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true); // allow non-browser requests
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, origin); // dynamically echo back the correct origin
-    }
-    return callback(new Error("Not allowed by CORS"));
-  },
-  credentials: true,
-}*/
-
-
-// For production only:
-/*app.use(cors({
-  origin: "https://membership-app-ui.vercel.app",
-  credentials: true,
-}));*/
 
 
 app.use(express.json());
