@@ -173,7 +173,7 @@ const createUser = async (req, res) => {
 
   //Confirm that all fields are provided
 
-  if (!unitId || !userName || !staffName || !password || !role) {
+  if (!unitId || !userName || !staffName || !role) {
 
     return res.status(400).json ({status: "badRequest", message: "Missing required field(s)", user: {}})
 
