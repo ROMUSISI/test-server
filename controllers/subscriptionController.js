@@ -497,6 +497,9 @@ const verifyToken = async(req, res) => {
   const {userId} = req.user;
   const userInfo = {userId}
 
+  console.log('phone token in verify token: ', phoneToken, 'userId: ', userId);
+  
+
   try {
     const response = await subscriptionService.verifyToken(userInfo, phoneToken)
     return res.status(200).json({

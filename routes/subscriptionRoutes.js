@@ -22,10 +22,10 @@ router.post ('/confirmpayments', authenticateUser, subscriptionController.confir
 
 router.put('/deletemanypayments',authenticateUser, subscriptionController.deleteManyPayments)
 
-router.post('/verifytoken',authenticateUser, subscriptionController.verifyToken)
+router.post('/verifypaymenttoken',authenticateUser, subscriptionController.verifyToken)
 
-router.get('/createtoken',authenticateUser, subscriptionController.createToken)
+router.get('/createpaymenttoken',authenticateUser, subscriptionController.createToken)
 
-router.get('/tokenstatus',authenticateUser, subscriptionController.checkTokenStatus)
+router.get('/paymenttokenstatus',authenticateUser, subscriptionController.checkTokenStatus)
 
 module.exports = router;
