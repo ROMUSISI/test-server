@@ -37,7 +37,7 @@ const getDashInfo = async (userId, role, unitId) => {
             ( 
 
               SELECT s.uniqueMemberId, s.categoryValue, s.category, s.yearSubscribed, s.amountPaid, m.unitId
-              FROM Subscription AS s INNER JOIN member AS m
+              FROM subscription AS s INNER JOIN member AS m
               ON s.uniqueMemberId = m.uniqueMemberId
               WHERE m.deleted <> 1
               AND s.deleted <> 1
@@ -64,7 +64,7 @@ const getDashInfo = async (userId, role, unitId) => {
             ( 
 
               SELECT s.uniqueMemberId, s.categoryValue, s.category, s.yearSubscribed, s.amountPaid, m.unitId
-              FROM Subscription AS s INNER JOIN member AS m
+              FROM subscription AS s INNER JOIN member AS m
               ON s.uniqueMemberId = m.uniqueMemberId
               WHERE m.deleted <> 1
               AND s.deleted <> 1
@@ -88,7 +88,7 @@ const getDashInfo = async (userId, role, unitId) => {
       role === 'Director' ? 
       
         ` SELECT SUM(amountPaid) AS totalPaid
-          FROM Subscription 
+          FROM subscription 
           WHERE yearSubscribed = :currentYear
           AND category <> 'Welfare'
           AND deleted <> 1`
@@ -125,7 +125,7 @@ const getDashInfo = async (userId, role, unitId) => {
               ( 
 
                 SELECT s.uniqueMemberId, s.yearSubscribed, s.category, s.amountPaid, m.unitId
-                FROM Subscription AS s INNER JOIN member AS m
+                FROM subscription AS s INNER JOIN member AS m
                 ON s.uniqueMemberId = m.uniqueMemberId
                 WHERE m.deleted <> 1
                 AND s.deleted <> 1
@@ -153,7 +153,7 @@ const getDashInfo = async (userId, role, unitId) => {
               ( 
 
                 SELECT s.uniqueMemberId, s.yearSubscribed, s.category, s.amountPaid, m.unitId
-                FROM Subscription AS s INNER JOIN member AS m
+                FROM subscription AS s INNER JOIN member AS m
                 ON s.uniqueMemberId = m.uniqueMemberId
                 WHERE m.deleted <> 1
                 AND s.deleted <> 1
@@ -175,7 +175,7 @@ const getDashInfo = async (userId, role, unitId) => {
         role === 'Director' ? 
         
           ` SELECT SUM(amountPaid) AS totalPaid
-            FROM Subscription 
+            FROM subscription 
             WHERE yearSubscribed = :currentYear 
             AND category = 'Welfare'
             AND deleted <> 1`
@@ -217,7 +217,7 @@ const getDashInfo = async (userId, role, unitId) => {
               ( 
 
                 SELECT s.uniqueMemberId, s.yearSubscribed, s.amountPaid, m.unitId, s.categoryValue
-                FROM Subscription AS s INNER JOIN member AS m
+                FROM subscription AS s INNER JOIN member AS m
                 ON s.uniqueMemberId = m.uniqueMemberId
                 WHERE s.category = '${category}'
                 AND s.deleted <> 1
@@ -244,7 +244,7 @@ const getDashInfo = async (userId, role, unitId) => {
               ( 
 
                 SELECT s.uniqueMemberId, s.yearSubscribed, s.amountPaid, m.unitId, s.categoryValue
-                FROM Subscription AS s INNER JOIN member AS m
+                FROM subscription AS s INNER JOIN member AS m
                 ON s.uniqueMemberId = m.uniqueMemberId
                 WHERE s.category = '${category}'
                 AND s.deleted <> 1

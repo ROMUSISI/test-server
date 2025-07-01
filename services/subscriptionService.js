@@ -42,7 +42,7 @@ const getAllMemberSubscriptions = async () => {
 
     //Then check if there are subscriptions
     const subscriptionsArray = await sequelize.query (
-      `SELECT * FROM Subscription LIMIT 1`
+      `SELECT * FROM subscription LIMIT 1`
     )
     if (!subscriptionsArray || !subscriptionsArray[0]) { //No members
       return({status: 'Not Found', message: 'No subscriptions found', subscriptions: []})
@@ -118,7 +118,7 @@ const getAllMemberSubscriptions = async () => {
     );
 
     if (allSubscriptionsArray && allSubscriptionsArray[0]) {
-      return({status: 'OK', message: 'Subscription records successifully retrieved', subscriptions: allSubscriptionsArray})
+      return({status: 'OK', message: 'subscription records successifully retrieved', subscriptions: allSubscriptionsArray})
     }
 
     if (!allSubscriptionsArray || !allSubscriptionsArray[0]) {
@@ -159,7 +159,7 @@ const createPayment = async (paymentData) => {
       const existingCategories = await sequelize.query(
         `
           SELECT DISTINCT category
-          FROM Subscription
+          FROM subscription
           WHERE uniqueMemberId = :uniqueMemberId
             AND yearSubscribed = :yearSubscribed
             AND deleted <> 1
@@ -216,7 +216,7 @@ const createPayment = async (paymentData) => {
       const [paymentSummary] = await sequelize.query(
         `
           SELECT COALESCE(SUM(amountPaid), 0) AS totalPaid
-          FROM Subscription
+          FROM subscription
           WHERE uniqueMemberId = :uniqueMemberId
             AND yearSubscribed = :yearSubscribed
             AND category = :category
@@ -293,7 +293,7 @@ const createPayment = async (paymentData) => {
       paymentInsertQuery = paymentMode === 'membership' ?
 
         `
-        INSERT INTO Subscription(
+        INSERT INTO subscription(
           uniqueMemberId,
           receivedByUserId,
           yearSubscribed,
@@ -313,7 +313,7 @@ const createPayment = async (paymentData) => {
       :
 
       `
-      INSERT INTO Subscription(
+      INSERT INTO subscription(
         uniqueMemberId,
         receivedByUserId,
         yearSubscribed,
@@ -372,7 +372,7 @@ const createPayment = async (paymentData) => {
   
       const paymentArray = await sequelize.query (
         `
-          SELECT * FROM Subscription 
+          SELECT * FROM subscription 
           WHERE id = :paymentId
         `,
         {
@@ -421,7 +421,7 @@ const createPayment = async (paymentData) => {
         u.staffName AS receivedByUserName,
         m.unitId,
         m.memberName
-      FROM Subscription AS s
+      FROM subscription AS s
       JOIN user AS u ON s.receivedByUserId = u.id
       JOIN member AS m ON s.uniqueMemberId = m.uniqueMemberId
       WHERE
@@ -439,7 +439,7 @@ const createPayment = async (paymentData) => {
 
     const countQuery = `
       SELECT COUNT(*) AS total
-      FROM Subscription AS s
+      FROM subscription AS s
       JOIN user AS u ON s.receivedByUserId = u.id
       JOIN member AS m ON s.uniqueMemberId = m.uniqueMemberId
       WHERE 
@@ -465,6 +465,8 @@ const createPayment = async (paymentData) => {
       type: QueryTypes.SELECT,
       replacements
     });
+
+    console.log('all payments: ', allPaymentsArray)
 
     // Execute count query
     const totalCountArray = await sequelize.query(countQuery, {
@@ -522,7 +524,7 @@ const getPaymentById = async (id) => {
         s.lastModifiedByUserId,
         mu.userName AS lastModifiedByUserName,
         s.timeLastModified
-      FROM Subscription s
+      FROM subscription s
       INNER JOIN member m ON s.uniqueMemberId = m.uniqueMemberId
       LEFT JOIN user ru ON s.receivedByUserId = ru.id
       LEFT JOIN user mu ON s.lastModifiedByUserId = mu.id
@@ -558,7 +560,7 @@ const getAllPaymentsByMemberId = async(memberId) => {
           s.amountPaid,
           s.category,
           u.staffName AS receiptedBy
-        FROM Subscription AS s
+        FROM subscription AS s
         LEFT JOIN user as u
         ON s.receivedByUserId = u.id
         WHERE ((s.uniqueMemberId = :memberId) AND (s.deleted <>1))
@@ -626,7 +628,7 @@ const updatePayment = async (newPaymentData) => {
   try {
     //check whether the payment exists
     const paymentExistsArray = await sequelize.query (
-      ` SELECT * FROM Subscription WHERE id = :id`,
+      ` SELECT * FROM subscription WHERE id = :id`,
       {
         replacements: {id},
         type: QueryTypes.SELECT
@@ -634,13 +636,13 @@ const updatePayment = async (newPaymentData) => {
     );
 
     if (!paymentExistsArray || !paymentExistsArray[0]) {
-      return ({status: 'Not Found', message: 'Subscription not found', updatedPayment: []})
+      return ({status: 'Not Found', message: 'subscription not found', updatedPayment: []})
     }
 
     if (paymentExistsArray && paymentExistsArray[0]) {
       //proceed to update the payment record with new data
       const paymentUpdateMetaDataArray = await sequelize.query (
-        ` UPDATE Subscription 
+        ` UPDATE subscription 
           SET
             amountPaid = :newAmountPaid,
             lastModifiedByUserId = :newLastModifiedByUserId,
@@ -661,7 +663,7 @@ const updatePayment = async (newPaymentData) => {
       if (paymentUpdateMetaDataArray && paymentUpdateMetaDataArray[1]) {
         //retrieve the updated payment data
         const updatedPaymentArray = await sequelize.query (
-          ` SELECT * FROM Subscription AS s
+          ` SELECT * FROM subscription AS s
             WHERE s.id = :id
             LIMIT 1
           `,
@@ -714,7 +716,7 @@ const updatePayment = async (newPaymentData) => {
         u.staffName,
         m.unitId,
         m.memberName
-      FROM Subscription AS s
+      FROM subscription AS s
       JOIN user AS u ON s.receivedByUserId = u.id
       JOIN member AS m ON s.uniqueMemberId = m.uniqueMemberId)
 
@@ -741,7 +743,7 @@ const updatePayment = async (newPaymentData) => {
         u.staffName,
         m.unitId,
         m.memberName
-      FROM Subscription AS s
+      FROM subscription AS s
       JOIN user AS u ON s.receivedByUserId = u.id
       JOIN member AS m ON s.uniqueMemberId = m.uniqueMemberId)
 
@@ -812,7 +814,7 @@ const confirmPayments = async (pendingArray) => {
           const paymentId = payment.id;
 
           await sequelize.query(
-            `UPDATE Subscription s
+            `UPDATE subscription s
              SET s.confirmed = :confirmedStatus
              WHERE s.id = :paymentId`,
             {
@@ -872,7 +874,7 @@ const deleteManyPayments = async(pendingArray) => {
       console.log ('Payment marked for deletion:', payment)
 
       await sequelize.query(
-        `UPDATE Subscription set deleted = true where
+        `UPDATE subscription set deleted = true where
          id = :paymentId`,
          {
           replacements: {paymentId},
