@@ -628,7 +628,8 @@ const verifyToken = async(token, userName) => {
       })
     };
 
-
+    console.log('hashed token from db: ', hashedToken)
+    
     if (new Date(hashedToken.accountTokenCreatedAt) < twentyMinutesAgo) {
       return {
         status: 'Not Found',
