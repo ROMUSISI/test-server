@@ -40,6 +40,8 @@ router.put ('/user/:id', authenticateUser, checkRoleDuplication,
   
 )
 
+//Routes for sign up steps. [These are not for verifying paymenst]
+
 router.post('/verifyusername', userController.verifyUserName)
 
 router.post('/verifytoken', userController.verifyToken)

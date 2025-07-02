@@ -51,7 +51,7 @@ const createSignUpToken = async(user) => {
 
     //Now post the hashed token into the db.
       await sequelize.query (
-        ` UPDATE User 
+        ` UPDATE user 
           SET accountToken = :hashedToken,
           accountTokenCreatedAt = NOW() 
           WHERE id = :id`,
