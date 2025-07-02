@@ -20,7 +20,7 @@ const getPaymentInfo = async(paymentId) => {
 
     const memberInfoArray = await sequelize.query(
       `SELECT memberName, phone1, phone2, emailAddress, unitId
-       FROM Member WHERE
+       FROM member WHERE
        uniqueMemberId = :uniqueMemberId
        LIMIT 1`,
        {

@@ -24,7 +24,7 @@ const { sequelize } = require("../databaseConnection/db");
           return staffData;
         }
       } catch (error) {
-        console.log('Error retrieving staff data for the unit of the new memeber');
+        console.log('Error retrieving staff data for the unit of the new memeber', error);
         return;
       }
     }

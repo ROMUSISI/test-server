@@ -934,8 +934,11 @@ const createToken = async(userInfo) => {
 
       //Try sending sms
 
+      console.log('phone number retrieved: ', phone)
+
       if(phone) {
         try {
+
           await sendYoolaSMS(phone, confirmationToken);
         } catch (error) {
           console.error('An error occurred while sending token to phone to verify payments', error)
