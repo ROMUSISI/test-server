@@ -1018,7 +1018,7 @@ const verifyToken = async (userInfo, phoneToken) => {
 
     if(tokenMatches) {
       await sequelize.query(
-        `UPDATE USER SET tokenverified = true where id = :userId`,
+        `UPDATE user SET tokenverified = true where id = :userId`,
         {
           type: QueryTypes.UPDATE,
           replacements: {userId}
