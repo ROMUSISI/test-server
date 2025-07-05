@@ -9,8 +9,8 @@ const { getWelfareStatus } = require('../reusables/getWelfareStatus');
 const getAllMembers = async (page, pageLimit, searchTerm, userInfo) => {
   const { unitId, role } = userInfo;
 
-  const offset = (parseInt(page) - 1) * parseInt(pageLimit);
-  const limit = parseInt(pageLimit);
+  const offset =  page && pageLimit ? (parseInt(page) - 1) * parseInt(pageLimit) : 0;
+  const limit = pageLimit ? parseInt(pageLimit) : 0;
   const year = new Date().getFullYear(); 
 
   try {
@@ -36,7 +36,7 @@ const getAllMembers = async (page, pageLimit, searchTerm, userInfo) => {
               OR LOWER(uniqueMemberId) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
             )` : ''}
         ORDER BY id
-        LIMIT :limit OFFSET :offset
+       ${limit && offset ? 'LIMIT :limit OFFSET :offset' : ''}
       ),
       PaymentsSummary AS (
         SELECT 
@@ -366,7 +366,7 @@ const createMember = async (memberData, userInfo) => {
     dob,
     country,
     district,
-    subcounty = 'Kawempe',
+    subcounty = 'Not provided',
     parish,
     cell,
     createdByUserId = 1,
