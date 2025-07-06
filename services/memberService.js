@@ -36,7 +36,7 @@ const getAllMembers = async (page, pageLimit, searchTerm, userInfo) => {
               OR LOWER(uniqueMemberId) LIKE LOWER(CONCAT('%', :searchTerm, '%'))
             )` : ''}
         ORDER BY id
-       ${limit && offset ? 'LIMIT :limit OFFSET :offset' : ''}
+       ${limit ? 'LIMIT :limit OFFSET :offset' : ''}
       ),
       PaymentsSummary AS (
         SELECT 

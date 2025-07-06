@@ -434,7 +434,7 @@ const createPayment = async (paymentData) => {
           AND m.deleted <> 1
           AND s.deleted <> 1
       ORDER BY s.timeReceived DESC
-      ${limit && offset ? 'LIMIT :limit OFFSET :offset' : ''}
+      ${limit ? 'LIMIT :limit OFFSET :offset' : ''}
     `;
 
     const countQuery = `
