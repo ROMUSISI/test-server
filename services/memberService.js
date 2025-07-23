@@ -5,6 +5,11 @@ const { sendEmail } = require('../reusables/sendEmail');
 const {sendYoolaSMS} = require('../reusables/sendYoolaSMS');
 const { getStaffInfo } = require('../reusables/getStaffInfo');
 const { getWelfareStatus } = require('../reusables/getWelfareStatus');
+const dotenv = require('dotenv'); 
+const { sendSmsBatches } = require('../reusables/sendSmsBatches');
+dotenv.config();
+
+console.log('login link: ', process.env.LOGIN_LINK)
 
 const getAllMembers = async (page, pageLimit, searchTerm, userInfo) => {
   const { unitId, role } = userInfo;
@@ -288,16 +293,44 @@ const createMember = async (memberData, userInfo) => {
         email: unitMAndEEmailAddress
       } = unitMAndEInfo;
 
+    
+       //get the information of the CAC chair info for the respective unit
+        const unitCacChairInfo = await getStaffInfo('Chairman CAC', memberUnitId);
+
+        const {
+          staffName: unitCacChairName,
+          phone: unitCacChairPhone,
+          email: unitCacChairEmailAddress
+        } = unitCacChairInfo;
+        
+
+      //get email and name of the board chair 
+      const boardChairInfo = await getStaffInfo('Chairman Board Of Trustees');
+      console.log('Board chair Info: ', boardChairInfo);
+
+      const {
+        staffName: boardChairName, 
+        email: boardChairEmail
+      } = boardChairInfo;
+
+      //get email and name of the ed
+      const edInfo = await getStaffInfo('Executive Director');
+      const {
+        staffName: edName, 
+        email: edEmail
+      } = edInfo;
+
+
       console.log('unit M&E info: ', unitMAndEInfo)
 
       //get total number of clients for the unit
-      const getUnitMemberTotal = async(unitId) => {
+      const getMemberTotal = async(unitId = null) => {
         try {
           const totalArray = await sequelize.query(
-            `SELECT COUNT(uniqueMemberId) AS total FROM member WHERE unitId = :unitId`,
+            `SELECT COUNT(uniqueMemberId) AS total FROM member WHERE  deleted <> 1 ${unitId ? 'AND unitId = :unitId' : '' } `,
             {
               type: QueryTypes.SELECT,
-              replacements: {unitId}
+              replacements: unitId ? {unitId} : {}
             }
           );
           return totalArray[0].total
@@ -307,12 +340,19 @@ const createMember = async (memberData, userInfo) => {
         }
       }
 
-      const unitMemberTotal = (await getUnitMemberTotal(memberUnitId)).toString() || ''
+
+
+      //the total number of members per unit to notify the center manager, the cac chair and the M&E officer
+      const unitMemberTotal = (await getMemberTotal(memberUnitId)).toString() || ''
+
+      //also get total number of members for the entire organization to notify the ed and the board chair
+      const globalMemberTotal = (await getMemberTotal()).toString() || ''
+      
 
       const unitEmailNotification = {
-        to: unitMAndEEmailAddress.trim(),
+        to: unitCacChairEmailAddress.trim(),
         subject: `New TASO Subscriber member registered by ${userName}`.trim(),
-        body: `Dear ${unitMAndEName}, 
+        body: `Dear ${unitCacChairName}, Chairman CAC ${memberUnitId}, 
         \nThis is to notify you that a new TASO subscriber member has been registered at ${memberUnitId}.
         \nMember name: ${memberName}, Member Id: ${newMemberId}
         \nPhone number(s):${memberPhone1 && memberPhone1} ${memberPhone2 && ',' + memberPhone2}
@@ -321,7 +361,25 @@ const createMember = async (memberData, userInfo) => {
         \nRegards,
         \nMyTASO\nThe Aids Support Organization,\nHealthy and empowered communities`.trim()
         ,
-        cc: unitHeadEmailAddress.trim()
+        cc: unitHeadEmailAddress.trim(),
+        bcc: unitMAndEEmailAddress.trim()
+      }
+
+      const boardNotification = {
+        to: boardChairEmail.trim(),
+        subject: `New TASO Subscriber member registered at ${memberUnitId}`.trim(),
+        body: `Dear ${boardChairName}, Chairman TASO Board of Trustees, 
+        \nThis is to notify you that a new TASO subscriber member has been registered at ${memberUnitId}.
+        \nMember name: ${memberName}, Member Id: ${newMemberId}
+        \nPhone number(s):${memberPhone1 && memberPhone1} ${memberPhone2 && ',' + memberPhone2}
+        \nEmail address: ${memberEmailAddress || 'No email address provided'}
+        \nThe current ${memberUnitId} total membership is: ${unitMemberTotal}.
+        \nThe current TASO Global membership is: ${globalMemberTotal}.
+        \nYou may click this link to login and view the details: ${process.env.LOGIN_LINK}
+        \nRegards,
+        \nMyTASO\nThe Aids Support Organization,\nHealthy and empowered communities`.trim()
+        ,
+        cc: edEmail.trim()
       }
 
 
@@ -344,10 +402,23 @@ const createMember = async (memberData, userInfo) => {
           unitEmailNotification.to, 
           unitEmailNotification.subject, 
           unitEmailNotification.body, 
-          unitEmailNotification.cc
+          unitEmailNotification.cc,
+          unitEmailNotification.bcc
         )
       } catch (error) {
         console.error('error sending email to head of unit and admin: ', error)
+      }
+
+      try {
+        //Notify the the board chair and ed
+        sendEmail(
+          boardNotification.to, 
+          boardNotification.subject, 
+          boardNotification.body, 
+          boardNotification.cc
+        )
+      } catch (error) {
+        console.error('error sending email to ed and board chair: ', error)
       }
  
       return newMemberId.trim();
@@ -660,6 +731,8 @@ const deleteMember = async(memberId, staffName) => {
     })
   }
 }
+
+
 
 module.exports = {
   getAllMembers,

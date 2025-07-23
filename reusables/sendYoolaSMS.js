@@ -22,7 +22,10 @@ async function sendYoolaSMS(phone, message) {
       }
     });
 
+    console.log(response.data)
+
     return response.data;
+
   } catch (error) {
     // You can customize this error handling as needed
     console.log('Error sending sms: ', error)

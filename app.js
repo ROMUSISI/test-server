@@ -27,6 +27,8 @@ const Unit = require('./models/unit')
 const Role = require('./models/role')
 const Country = require('./models/country');
 const cookieParser = require('cookie-parser');
+const { addRenewalReminderJobs } = require('./scheduledJobs/jobAdders');
+const { renewalReminderWorker } = require('./scheduledJobs/workers');
 
 
 dotenv.config();
@@ -48,6 +50,9 @@ app.use(countryRoutes);
 app.use(roleRoutes);
 app.use(dashboardRoutes);
 app.use(testRoutes);
+
+//Add background repetitive jobs
+//addRenewalReminderJobs(); //make sure the corresponding worker was imported and not called
 
 const startServer = async() => {      //function to start server
   try {

@@ -14,7 +14,9 @@ router.post('/member', authenticateUser, checkUnitStructure, memberController.cr
 
 router.put ('/member/:id', authenticateUser, memberController.updateMember);
 
-router.put ('/deletemember/:id', authenticateUser, memberController.deleteMember)
+router.put ('/deletemember/:id', authenticateUser, memberController.deleteMember);
+
+router.post('/sms-all-members', authenticateUser, memberController.smsAllMembers);
 
 module.exports = router;
 

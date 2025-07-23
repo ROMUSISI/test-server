@@ -395,7 +395,8 @@ const login = async (userData) => {
             role: userExists[0].role,
             userId: userExists[0].id,
             phone: userExists[0].phone,
-            email: userExists[0].email
+            email: userExists[0].email,
+            allowNotifications: userExists[0].allowNotifications
           }, 
           
           process.env.JWT_SECRET, 
@@ -774,7 +775,7 @@ const confirmPassword = async(userName, password) => {
       return({
         status: 'OK',
         confirmed: true,
-        message: 'Congratulations!\nYour password was successifully set.\nYou can now login'
+        message: 'Congratulations! Your password was successifully set.You can now login'
       });
 
     };
@@ -791,6 +792,33 @@ const confirmPassword = async(userName, password) => {
   }
 }
 
+const notifyMe = async(userName) => {
+  try {
+    const [notifcationStatus] = await sequelize.query (
+      `SELECT getNotifications
+       FROM user 
+       WHERE userName = :userName
+       LIMIT 1`, {
+        replacements: {userName},
+        type: QueryTypes.SELECT
+       }
+    );
+
+    return({
+      status: 'OK',
+      notifcationStatus: notifcationStatus
+    })
+    console.log('getNotificationStatus: ', notifcationStatus)
+  } catch (error) {
+    console.log('error happened while retrieving getNotification status: ', error);
+    return({
+      status: 'Error',
+      notifcationStatus: null
+    })
+  }
+}
+
+
 module.exports = {
   getAllUsers,
   getUserById,
@@ -801,5 +829,6 @@ module.exports = {
   verifyUserName,
   verifyToken,
   createPassword,
-  confirmPassword
+  confirmPassword,
+  notifyMe
 };

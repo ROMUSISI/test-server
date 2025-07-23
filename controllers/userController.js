@@ -481,7 +481,65 @@ const confirmPassword = async(req, res) => {
       })
 
   }
+};
+const notifyMe = async(req, res) => {
+  const {username} = req.user;
+  console.log('incoming user name: ', username)
+  try {
+    const response = await  userService.notifyMe(username)
+
+    if(response && response.status === 'OK'){
+      return res.status(200).json({
+        notificationStatus: response.notifcationStatus
+      })
+    }
+
+    if(response && response.status === 'Error'){
+      return res.status(500).json({
+        notificationStatus: response.notifcationStatus
+      })
+    }
+  } catch (error) {
+    console.log('Error happened while retrieving getNotification status: ', error)
+      return res.status(500).json({
+        notificationStatus: null
+      })
+  }
 }
+
+const smsAllUsers = async(req, res) => {
+  //destructure the incoming request
+  const {message, recipientType} = req.body;
+  const {unitId} = req.user;
+  try {
+
+    const response = await smsAllMembersOrUsers (message.trim(), recipientType, unitId);
+
+    if(response && response.status === 'OK'){
+      return res.status(200).json({
+        message: response.message
+      })
+    }
+
+    if(response && response.status === 'Not Found'){
+      return res.status(404).json({
+        message: response.message
+      })
+    }
+
+    if(response && response.status === 'Error'){
+      return res.status(500).json({
+        message: response.message
+      })
+    }
+
+  } catch (error) {
+    console.log('An error occurred while sending bulk messages to users: ', error);
+    return res.status(500).json({
+      message: 'An internal server error occurred while trying to send messages. Please try again'
+    })
+  }
+};
 
 module.exports = {
   getAllUsers,
@@ -493,5 +551,7 @@ module.exports = {
   verifyUserName,
   verifyToken,
   createPassword,
-  confirmPassword
+  confirmPassword,
+  notifyMe,
+  smsAllUsers
 };

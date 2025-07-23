@@ -4,6 +4,7 @@ const userController = require ('../controllers/userController');
 const {authenticateUser} = require('../middleware/authenticateUserMiddleWare');
 const { checkRoleDuplication } = require('../middleware/checkRoleDuplication');
 const { enforceOneEntryAccount } = require('../middleware/enforceOneEntryAccount');
+const { smsAllMembersOrUsers } = require('../reusables/smsAllMembersOrUsers');
 
 router.get('/user', authenticateUser,
   userController.getAllUsers
@@ -49,5 +50,9 @@ router.post('/verifytoken', userController.verifyToken)
 router.post('/createpassword', userController.createPassword)
 
 router.post('/confirmpassword', userController.confirmPassword)
+
+router.get('/notifyme', authenticateUser, userController.notifyMe)
+
+router.post('/sms-all-users', authenticateUser, smsAllMembersOrUsers)
 
 module.exports = router;

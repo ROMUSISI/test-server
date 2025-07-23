@@ -4,17 +4,15 @@ const {QueryTypes } = require("sequelize");
 const { sequelize } = require("../databaseConnection/db");
 
     //This information will be shared with the member and also the two staffs will be notified of the new member registered.
-    const getStaffInfo = async(role, unitId) => {
+    const getStaffInfo = async(role, unitId = null) => {
       try {
         const staffDataArray = await sequelize.query(
           `SELECT staffName, phone, email FROM user
-           WHERE unitId = :unitId AND role = :role
+           WHERE role = :role ${unitId ? 'AND unitId = :unitId' : ''}
            LIMIT 1`,
            {
             type: QueryTypes.SELECT,
-            replacements: {
-              unitId, role
-            }
+            replacements: unitId ? {unitId, role}: {role}
            }
         );
 
