@@ -29,6 +29,7 @@ const Country = require('./models/country');
 const cookieParser = require('cookie-parser');
 const { addRenewalReminderJobs } = require('./scheduledJobs/jobAdders');
 const { renewalReminderWorker } = require('./scheduledJobs/workers');
+const { getInactiveMembers } = require('./reusables/getInactiveMembers');
 
 
 dotenv.config();
@@ -53,6 +54,8 @@ app.use(testRoutes);
 
 //Add background repetitive jobs
 //addRenewalReminderJobs(); //make sure the corresponding worker was imported and not called
+
+getInactiveMembers('TASO Masindi')
 
 const startServer = async() => {      //function to start server
   try {
