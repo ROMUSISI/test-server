@@ -14,6 +14,7 @@ const countryRoutes = require ('./routes/countryRoutes')
 const roleRoutes = require ('./routes/roleRoutes')
 const dashboardRoutes = require ('./routes/dashboardRoutes')
 const testRoutes = require('./routes/testRoutes')
+const messageRoutes = require('./routes/messageRoutes')
 const dotenv = require ('dotenv');
 
 
@@ -51,6 +52,7 @@ app.use(countryRoutes);
 app.use(roleRoutes);
 app.use(dashboardRoutes);
 app.use(testRoutes);
+app.use(messageRoutes)
 
 //Add background repetitive jobs
 //addRenewalReminderJobs(); //make sure the corresponding worker was imported and not called
