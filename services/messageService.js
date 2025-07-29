@@ -124,52 +124,48 @@ const handleSendMemberMessages = async(message, userId) => {
   }
 };
 
+
+
 const getAllMessages = async(userId, pageLimit, page, unitId, messageType) => {
 
   const limit = pageLimit;
   const offset = (Number(page)*Number(pageLimit) - Number(pageLimit))
+  
+  let mainQuery = '';
+  let countQuery = '';
+  let messageReplacements = {};
 
-  try {
-    const messagesArray = await sequelize.query(
+  if (messageType === 'draft' || 'sent') {
 
-      ` 
-      WITH q1 AS
-        (SELECT 
-            m.id,
-            m.dateCreated,
-            m.dateSent,
-            m.message,
-            m.draft,
-            m.sent,
-            m.userId,
-            u.staffName,
-            u.unitId
-          FROM 
-            message m INNER JOIN user u
-            ON m.userId = u.id)
-           
-        SELECT 
-          *
-          FROM q1
-          WHERE q1.unitId = :unitId
-          AND ${messageType === 'draft' ? 'draft = 1' : 'sent = 1'}
-          ORDER BY
-          dateCreated DESC
-          LIMIT :limit
-          OFFSET :offset
-      `,
-      {
-        type: QueryTypes.SELECT,
-        replacements: {offset, limit, unitId}
-      }
-    );
+    mainQuery = 
+      `WITH q1 AS
+          (SELECT 
+              m.id,
+              m.dateCreated,
+              m.dateSent,
+              m.message,
+              m.draft,
+              m.sent,
+              m.userId,
+              u.staffName,
+              u.unitId
+            FROM 
+              message m INNER JOIN user u
+              ON m.userId = u.id)
+            
+          SELECT 
+            *
+            FROM q1
+            WHERE q1.unitId = :unitId
+            AND ${messageType === 'draft' ? 'draft = 1' : 'sent = 1'}
+            ORDER BY
+            dateCreated DESC
+            LIMIT :limit
+            OFFSET :offset
+        `;
 
-    console.log('Messages Array: ', messagesArray)
-
-    //get total messages and totalPages
-    const [totalMessages] = await sequelize.query(
-      ` 
-      WITH q1 AS
+     countQuery = 
+      `WITH q1 AS
         (SELECT 
             m.id,
             m.dateCreated,
@@ -189,7 +185,56 @@ const getAllMessages = async(userId, pageLimit, page, unitId, messageType) => {
           FROM q1
           WHERE q1.unitId = :unitId
           AND ${messageType === 'draft' ? 'draft = 1' : 'sent = 1'}
-      `,
+      `;
+
+      messageReplacements = 
+        {offset, limit, unitId};
+
+  }
+
+
+  if (messageType === 'queued') {
+
+    mainQuery = 
+      `WITH q1 AS
+          (SELECT 
+              m.id,
+              m.date,
+              m.message,
+              m.unitId,
+              m.phone
+            FROM 
+              messageQueue m)
+           
+        SELECT 
+          *
+          FROM q1
+      `;
+
+    countQuery = 
+      `SELECT 
+          COUNT (id) AS total
+          FROM messageQueue
+      `;
+
+    messageReplacements = 
+      {}
+  }
+
+  try {
+    const messagesArray = await sequelize.query(
+      mainQuery,
+      {
+        type: QueryTypes.SELECT,
+        replacements: messageReplacements
+      }
+    );
+
+    console.log('Messages Array: ', messagesArray)
+
+    //get total messages and totalPages
+    const [totalMessages] = await sequelize.query(
+      countQuery,
         {
           type: QueryTypes.SELECT,
           replacements: {unitId}
@@ -228,10 +273,88 @@ const getAllMessages = async(userId, pageLimit, page, unitId, messageType) => {
         totalPages: 0
       })
   }
-}
+};
+
+const getMessageCounts = async () => {
+  try {
+
+    const [sentTotal] = await sequelize.query (
+      `SELECT COUNT(id) AS total FROM message WHERE sent = 1`,
+      {type: QueryTypes.SELECT}
+    );
+
+    const [draftTotal] = await sequelize.query (
+      `SELECT COUNT(id) AS total FROM message WHERE draft = 1`,
+      {type: QueryTypes.SELECT}
+    );
+
+    const [queuedTotal] = await sequelize.query (
+      `SELECT COUNT(id) AS total FROM messageQueue`,
+      {type: QueryTypes.SELECT}
+    );
+
+    const [logTotal] = await sequelize.query (
+      `SELECT COUNT(id) AS total FROM messageLog WHERE message IS NOT NULL AND phone IS NOT NULL`,
+      {type: QueryTypes.SELECT}
+    );
+
+    const [creditTotal] = await sequelize.query(
+
+      `WITH q1 AS (
+        SELECT MAX(id) AS id 
+        FROM messageLog 
+        WHERE credit IS NOT NULL
+      )
+
+      SELECT 
+        m.credit AS total
+        FROM messageLog m INNER JOIN q1
+        ON m.id = q1.id
+      `,
+      {
+        type: QueryTypes.SELECT
+      }
+    );
+
+    return (
+      {
+        message: 'Message totals were successifully obtained', 
+        status: 'OK',
+        totals: {
+          sentTotal: sentTotal.total || 0,
+          draftTotal: draftTotal.total || 0,
+          queuedTotal: queuedTotal.total || 0,
+          logTotal: logTotal.total || 0,
+          creditTotal: creditTotal.total || 0
+        }
+      }
+    )
+
+  } catch (error) {
+
+    console.log('An error occurred while trying to get message totals: ', error)
+
+    return (
+      {
+        message: 'An error happened while retrieving message totals', 
+        status: 'Error',
+        totals: {
+          sentTotal: null,
+          draftTotal: null,
+          queuedTotal: null,
+          logTotal: null,
+          creditTotal: null
+        }
+      }
+    )
+  }
+};
+
+
 
 module.exports = {
   handleDraftMemberMessages,
   handleSendMemberMessages,
-  getAllMessages
+  getAllMessages,
+  getMessageCounts
 }

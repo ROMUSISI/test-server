@@ -1,3 +1,4 @@
+const { tryCatch } = require('bullmq');
 const messageService = require('../services/messageService')
 
 const handleMemberMessages = async(req, res) => {
@@ -88,9 +89,29 @@ const getAllMessages = async(req, res) => {
         totalPages: 0
       })
   }
-}
+};
+
+
+const getMessageCounts = async(req, res) => {
+  try {
+    const response = await messageService.getMessageCounts();
+    if(response && response.status === 'OK') {
+      return res.status(200).json ({
+        message: response.message,
+        totals: response.totals
+      })
+    }
+  } catch (error) {
+    console.log('An error happened in the controller while getting message totals: ', error);
+    return res.status(500).json ({
+        message: 'An internal server error happened while retrieving message totals',
+        totals: {}
+      })
+  }
+};
 
 module.exports = {
   handleMemberMessages,
-  getAllMessages
+  getAllMessages,
+  getMessageCounts
 };

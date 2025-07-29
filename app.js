@@ -31,6 +31,10 @@ const cookieParser = require('cookie-parser');
 const { addRenewalReminderJobs } = require('./scheduledJobs/jobAdders');
 const { renewalReminderWorker } = require('./scheduledJobs/workers');
 const { getInactiveMembers } = require('./reusables/getInactiveMembers');
+const { checkSmsCredit } = require('./reusables/smsHelpers/checkSmsCredit');
+const { storeSentMessage } = require('./reusables/smsHelpers/storeSentMessage');
+const { queueMessage } = require('./reusables/smsHelpers/queueMessage');
+const { deductCredit } = require('./reusables/smsHelpers/deductCredit');
 
 
 dotenv.config();
@@ -56,6 +60,20 @@ app.use(messageRoutes)
 
 //Add background repetitive jobs
 //addRenewalReminderJobs(); //make sure the corresponding worker was imported and not called
+
+
+
+//AM CURRENTLY USING THIS SPACE FOR TESTING 
+
+
+
+
+//checkSmsCredit();
+//storeSentMessage('Am just storing the Id', '0774290744', 'TASO GMU')
+//queueMessage('Just trying to queue unsent messages for future sending when credit is available', '0774290644', 'TASO Masindi');
+//deductCredit(18);
+
+
 
 getInactiveMembers('TASO Masindi')
 

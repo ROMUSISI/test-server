@@ -8,4 +8,6 @@ router.post('/sms-members', authenticateUser, messageController.handleMemberMess
 
 router.post('/get-all-messages', authenticateUser, messageController.getAllMessages);
 
+router.get('/get-message-counts', authenticateUser, messageController.getMessageCounts);
+
 module.exports = router;
