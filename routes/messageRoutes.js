@@ -10,4 +10,6 @@ router.post('/get-all-messages', authenticateUser, messageController.getAllMessa
 
 router.get('/get-message-counts', authenticateUser, messageController.getMessageCounts);
 
+router.post('/top-up-sms', messageController.topUpSms);
+
 module.exports = router;

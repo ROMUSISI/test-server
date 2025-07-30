@@ -350,11 +350,95 @@ const getMessageCounts = async () => {
   }
 };
 
+const topUpSms = async (topUp) => {
+  try{
+    const [insertId, affectedRows] = await sequelize.query (
+      `INSERT INTO messageLog
+       (topUp)
+       VALUES 
+       (:topUp)`,
+       {
+        type: QueryTypes.INSERT,
+        replacements: {
+          topUp
+        }
+       }
+    );
 
+    const topUpId = Number(insertId)
+
+    if(topUpId) {
+      //get old credit
+      const prevId = topUpId - 1
+      const [oldCreditObject] = await sequelize.query(
+        `SELECT credit 
+         FROM messageLog
+         WHERE id = :prevId`,
+         {
+          type: QueryTypes.SELECT,
+          replacements: {
+            prevId
+          }
+         }
+      );
+
+      const oldCredit = Number(oldCreditObject.credit) || 0
+
+      //update credit
+       await sequelize.query(
+        `UPDATE messageLog
+         SET credit = :oldCredit + topUp
+         WHERE id = :topUpId`,
+         {
+          replacements: {topUpId, oldCredit},
+          type: QueryTypes.UPDATE
+         }
+      );
+
+      //now extract the new credit
+
+      const [newCreditObject] = await sequelize.query(
+        `SELECT COALESCE(credit, 0) AS credit
+         FROM messageLog
+         WHERE id = :topUpId`,
+         {
+          replacements: {topUpId},
+          type: QueryTypes.SELECT
+         }
+      );
+
+      const newCredit = newCreditObject.credit;
+
+      return ({
+        status: 'OK',
+        message: 'New credit successifully added and retrieved',
+        newCredit: newCredit
+      });
+
+    };
+
+      return ({
+        status: 'Bad Request',
+        message: 'Failed to update or retrieve new sms credit',
+        newCredit: ''
+      });
+
+    
+  }catch(error) {
+    console.log('An error occurred while posting new credit: ', error);
+
+      return ({
+        status: 'Error',
+        message: 'An error occurred while posting new credit',
+        newCredit: ''
+      });
+  }
+}
 
 module.exports = {
   handleDraftMemberMessages,
   handleSendMemberMessages,
   getAllMessages,
-  getMessageCounts
+  getMessageCounts,
+  topUpSms
 }

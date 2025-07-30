@@ -110,8 +110,49 @@ const getMessageCounts = async(req, res) => {
   }
 };
 
+const topUpSms = async(req, res) => {
+
+  const {topUp} = req.body;
+  try {
+
+    const response = await messageService.topUpSms(topUp)
+
+    if(response && response.status === 'OK'){
+      return res.status(200).json({
+        message: response.message,
+        newCredit: response.newCredit
+      })
+    }
+
+    if(response && response.status === 'Bad Request'){
+      return res.status(400).json({
+        message: response.message,
+        newCredit: response.newCredit
+      })
+    }
+
+    if(response && response.status === 'Error'){
+      return res.status(500).json({
+        message: response.message,
+        newCredit: response.newCredit
+      })
+    }
+
+  } catch (error) {
+    
+    console.log('An error occurred in the controller while updating top up of sms', error)
+
+      return res.status(500).json({
+        message: 'An error occurred in the controller while updating top up of sms',
+        newCredit: ''
+
+      })
+  }
+}
+
 module.exports = {
   handleMemberMessages,
   getAllMessages,
-  getMessageCounts
+  getMessageCounts,
+  topUpSms
 };
