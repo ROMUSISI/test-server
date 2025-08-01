@@ -1,5 +1,6 @@
 const ExcelJS = require('exceljs');
-const sequelize = require('../db');
+const {sequelize} = require('../databaseConnection/db');
+const {QueryTypes}  = require ('sequelize')
 
 /**
  * Streams a dynamic Excel file to the HTTP response.
@@ -11,7 +12,7 @@ const sequelize = require('../db');
  * @param {(row: object) => any[]} options.rowMapper - Function to map each row to an Excel row
  * @param {number} [options.batchSize=1000] - Optional: batch size
  */
-async function exportToExcel(res, { query, headers, rowMapper, batchSize = 1000 }) {
+async function exportToExcel(res, { query, headers, rowMapper, batchSize = 500, excelReplacements = {} }) {
   // Set response headers
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   res.setHeader('Content-Disposition', 'attachment; filename="export.xlsx"');
@@ -28,9 +29,9 @@ async function exportToExcel(res, { query, headers, rowMapper, batchSize = 1000 
   try {
     while (keepGoing) {
       const paginatedQuery = `${query} LIMIT :limit OFFSET :offset`;
-      const [rows] = await sequelize.query(paginatedQuery, {
-        replacements: { limit: batchSize, offset },
-        type: sequelize.QueryTypes.SELECT,
+      const rows = await sequelize.query(paginatedQuery, {
+        replacements: {...excelReplacements, limit: batchSize, offset },
+        type: QueryTypes.SELECT,
       });
 
       if (rows.length === 0) break;
@@ -40,6 +41,7 @@ async function exportToExcel(res, { query, headers, rowMapper, batchSize = 1000 
         sheet.addRow(formattedRow).commit();
       }
 
+      console.log('batch queried')
       offset += batchSize;
       if (rows.length < batchSize) keepGoing = false;
     }
