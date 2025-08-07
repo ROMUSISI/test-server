@@ -15,18 +15,18 @@ async function sendYoolaSMS(phone, message) {
     api_key: process.env.YOOLA_API_KEY
   };
 
-  try {/*
+  try {
     const response = await axios.post('https://yoolasms.com/api/v1/send', payload, {
       headers: {
         'Content-Type': 'application/json'
       
-    });
+    }});
 
     console.log(response.data)
 
     return response.data;
 
-  */} catch (error) {
+  } catch (error) {
     // You can customize this error handling as needed
     console.log('Error sending sms: ', error)
     return;

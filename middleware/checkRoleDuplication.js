@@ -10,11 +10,11 @@ const checkRoleDuplication = async(req, res, next) => {
     
     console.log('Role of user being registered or edited: ',role, unitId )
 
-    if(role === 'Head of unit' || role === 'M&E Officer' || role === 'unit admin/accountant') {
+    if(role === 'Head of unit' || role === 'M&E Officer' || role === 'unit admin/accountant' || role === 'Chairman CAC') {
 
       const [existingRole] = await sequelize.query(
         `SELECT staffName, userName, id
-         FROM User 
+         FROM user 
          WHERE role = :role
          AND unitId =  :unitId
          LIMIT 1`,
@@ -23,6 +23,8 @@ const checkRoleDuplication = async(req, res, next) => {
           replacements: {role, unitId}
          }
       );
+
+      console.log('Existing role: ',existingRole)
 
       if(existingRole && existingRole.id !== id) {
         return res.status(409).json({
@@ -33,7 +35,30 @@ Assign one of the two staffs another role eg. User. Thank you.`
       }
     } 
 
-    
+
+  if(role === 'Executive Director' || role === 'Chairman Board Of Trustees') {
+
+      const [existingRole] = await sequelize.query(
+        `SELECT staffName, userName, id
+         FROM user 
+         WHERE role = :role
+         LIMIT 1`,
+         {
+          type: QueryTypes.SELECT,
+          replacements: {role}
+         }
+      );
+
+      console.log('existing role: ', existingRole)
+
+      if(existingRole && existingRole.id !== id) {
+        return res.status(409).json({
+          message: `Our organization can only have one ${role} and ${existingRole.staffName} 
+has already been assigned this role.
+Assign one of the two staffs another role. Thank you.`
+        })
+      }
+    } 
 
   next()
   } catch (error) {

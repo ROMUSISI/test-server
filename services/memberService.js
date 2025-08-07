@@ -304,7 +304,7 @@ const createMember = async (memberData, userInfo) => {
         const unitCacChairInfo = await getStaffInfo('Chairman CAC', memberUnitId) || defaultStaffInfoObject
         
       const {
-        staffName: unitCacChairName , 
+        staffName: unitCacChairName, 
         email: unitCacChairEmailAddress
       } = unitCacChairInfo
 
@@ -354,9 +354,9 @@ const createMember = async (memberData, userInfo) => {
       
 
       const unitEmailNotification = {
-        to: unitCacChairEmailAddress.trim(),
+        to: unitHeadEmailAddress.trim(),
         subject: `New TASO Subscriber member registered by ${userName}`.trim(),
-        body: `Dear ${unitCacChairName}, Chairman CAC ${memberUnitId}, 
+        body: `Dear ${unitHeadName}, Unit Head, ${memberUnitId}, 
         \nThis is to notify you that a new TASO subscriber member has been registered at ${memberUnitId}.
         \nMember name: ${memberName}, Member Id: ${newMemberId}
         \nPhone number(s):${memberPhone1 && memberPhone1} ${memberPhone2 && ',' + memberPhone2}
@@ -365,8 +365,8 @@ const createMember = async (memberData, userInfo) => {
         \nRegards,
         \nMyTASO\nThe Aids Support Organization,\nHealthy and empowered communities`.trim()
         ,
-        cc: unitHeadEmailAddress.trim(),
-        bcc: unitMAndEEmailAddress.trim()
+        cc: unitMAndEEmailAddress.trim(),
+        bcc: unitCacChairEmailAddress.trim()
       }
 
       const boardNotification = {
