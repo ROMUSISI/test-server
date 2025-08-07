@@ -8,7 +8,7 @@ const renewalReminderWorker = new Worker (
   renewalReminderHandler,
   {connection}
 )
- 
+
 module.exports = {
   renewalReminderWorker
 }

@@ -262,9 +262,15 @@ const createMember = async (memberData, userInfo) => {
           replacements: {insertId, newMemberId}
         }
       );
+
+      const defaultStaffInfoObject = {
+          staffName: '',
+          phone: '',
+          email: ''
+        };
       
       //Now retrieve unit admin info
-      const unitAdminInfo = await getStaffInfo('unit admin/accountant', memberUnitId);
+      const unitAdminInfo = await getStaffInfo('unit admin/accountant', memberUnitId) || defaultStaffInfoObject;
       console.log('unit admin info for the new member', unitAdminInfo);
       //destructure the above object
       const {
@@ -274,7 +280,7 @@ const createMember = async (memberData, userInfo) => {
       } = unitAdminInfo;
 
       //Now get the unit head info
-      const unitHeadInfo = await getStaffInfo('Head of unit', memberUnitId);
+      const unitHeadInfo = await getStaffInfo('Head of unit', memberUnitId) || defaultStaffInfoObject;
       console.log('Unit head info for new member', unitHeadInfo)
       //now destructure the above object
       const {
@@ -284,7 +290,7 @@ const createMember = async (memberData, userInfo) => {
       } = unitHeadInfo;
 
       //Now get the unit m&E info
-      const unitMAndEInfo = await getStaffInfo('M&E Officer', memberUnitId);
+      const unitMAndEInfo = await getStaffInfo('M&E Officer', memberUnitId) || defaultStaffInfoObject;
       console.log('Unit M&E info for new member', unitMAndEInfo)
       //now destructure the above object
       const {
@@ -295,17 +301,15 @@ const createMember = async (memberData, userInfo) => {
 
     
        //get the information of the CAC chair info for the respective unit
-        const unitCacChairInfo = await getStaffInfo('Chairman CAC', memberUnitId);
-
-        const {
-          staffName: unitCacChairName,
-          phone: unitCacChairPhone,
-          email: unitCacChairEmailAddress
-        } = unitCacChairInfo;
+        const unitCacChairInfo = await getStaffInfo('Chairman CAC', memberUnitId) || defaultStaffInfoObject
         
+      const {
+        staffName: unitCacChairName , 
+        email: unitCacChairEmailAddress
+      } = unitCacChairInfo
 
       //get email and name of the board chair 
-      const boardChairInfo = await getStaffInfo('Chairman Board Of Trustees');
+      const boardChairInfo = await getStaffInfo('Chairman Board Of Trustees') || defaultStaffInfoObject;
       console.log('Board chair Info: ', boardChairInfo);
 
       const {
@@ -314,7 +318,7 @@ const createMember = async (memberData, userInfo) => {
       } = boardChairInfo;
 
       //get email and name of the ed
-      const edInfo = await getStaffInfo('Executive Director');
+      const edInfo = await getStaffInfo('Executive Director') || defaultStaffInfoObject;
       const {
         staffName: edName, 
         email: edEmail
