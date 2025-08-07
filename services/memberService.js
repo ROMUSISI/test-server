@@ -386,15 +386,14 @@ const createMember = async (memberData, userInfo) => {
         cc: edEmail.trim()
       }
 
-
       //Now send notifications to the member, unit head and unit admin
       const memberNotification = `
-        Dear ${memberName}, you have been registered as a TASO Member ${newMemberId}. call ${unitAdminPhone}, ${unitHeadPhone} for detatails.
+        Dear ${memberName}, you have been registered as a TASO subscriber Member No. ${newMemberId} at ${memberUnitId}. call ${unitAdminPhone}, ${unitHeadPhone} for detatails.
       `
 
       try {
         //send member notification
-       // await sendYoolaSMS(memberPhone1 || memberPhone2, memberNotification.trim());
+        await sendYoolaSMS(memberPhone1 || memberPhone2, memberNotification.trim());
 
       } catch (error) {
         console.error('Error sending sms to new member')
