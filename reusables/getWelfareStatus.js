@@ -8,7 +8,7 @@ const getWelfareStatus = async(id) => {
    const year = new Date().getFullYear()
 
     const [welfare] = await sequelize.query(
-      `SELECT SUM(amountPaid) AS total FROM Subscription
+      `SELECT SUM(COALESCE (amountPaid,0)) AS total FROM subscription
         WHERE uniqueMemberId = :id 
         AND yearSubscribed = :year
         AND category = 'Welfare'
@@ -20,7 +20,9 @@ const getWelfareStatus = async(id) => {
       }
     );
 
-    const welfareStatus = Number(welfare.total) >= 10000 ? 'Active' : 'Inactive';
+    console.log('welfare: ', welfare)
+
+    const welfareStatus = Number(welfare.total) >= 2000 ? 'Active' : 'Inactive';
     
     console.log('Welfare status: ', welfareStatus)
 
